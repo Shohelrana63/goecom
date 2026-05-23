@@ -23,7 +23,9 @@ type Product struct {
 var productList []Product
 
 func getProductsHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Fprintf(w, "Get Products")
+   w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
+   w.Header().Set("Content-Type", "application/json") // Set content type to JSON
+
 	if r.Method != "GET"{
 		http.Error(w, "Please use GET request", 400)
 		return
