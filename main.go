@@ -35,13 +35,36 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 	encoder.Encode(productList)
 }
 
+func createProductHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
+	w.Header().Set("Content-Type", "application/json") // Set content type to JSON
+
+	if r.Method != "POST"{
+		http.Error(w, "Please use POST request", 400)
+		return
+	}
+
+	var newProduct Product
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&newProduct)
+	if err != nil {
+		http.Error(w, "Please send valid JSON in  request body", 400)
+		return
+	}
+	newProduct.ID = len(productList) + 1 // Assign a new ID based on the current length of the product list
+	productList = append(productList, newProduct)
+
+	encoder := json.NewEncoder(w)
+	encoder.Encode(newProduct) // Return the newly created product as a response
+}
+
 func main () {
 	mux := http.NewServeMux() //router
 
 	mux.HandleFunc("/hello", helloHandler) //route
 	mux.HandleFunc("/about", aboutHandler) //route
     mux.HandleFunc("/getproducts", getProductsHandler) //route
-
+	mux.HandleFunc("/createproduct", createProductHandler) //route
 
 	fmt.Println("Server is running on http://localhost:8080")
 
