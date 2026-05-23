@@ -37,6 +37,8 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
+	w.Header().Set("Access-Control-Allow-Methods", "POST") // Allow only POST method
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	w.Header().Set("Content-Type", "application/json") // Set content type to JSON
 
 	if r.Method != "POST"{
