@@ -41,6 +41,11 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
 	w.Header().Set("Content-Type", "application/json") // Set content type to JSON
 
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(200) // Respond to preflight request
+		return
+	}
+
 	if r.Method != "POST"{
 		http.Error(w, "Please use POST request", 400)
 		return
@@ -56,6 +61,7 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	newProduct.ID = len(productList) + 1 // Assign a new ID based on the current length of the product list
 	productList = append(productList, newProduct)
 
+	w.writeHeader(201) // Set status code to 201 Created
 	encoder := json.NewEncoder(w)
 	encoder.Encode(newProduct) // Return the newly created product as a response
 }
