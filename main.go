@@ -30,8 +30,7 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.Encode(productList)
+	sendJSONResponse(w, productList, 200) // Return the product list with status code 200 OK
 }
 
 func createProductHandler(w http.ResponseWriter, r *http.Request) {
@@ -53,9 +52,8 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	newProduct.ID = len(productList) + 1 // Assign a new ID based on the current length of the product list
 	productList = append(productList, newProduct)
 
-	w.writeHeader(201) // Set status code to 201 Created
-	encoder := json.NewEncoder(w)
-	encoder.Encode(newProduct) // Return the newly created product as a response
+
+	sendJSONResponse(w, newProduct, 201) // Return the newly created product with status code 201 Created
 }
 
 func corsMiddleware(w http.ResponseWriter) {
@@ -69,6 +67,12 @@ func handlePreflightReq(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "OPTIONS" {
 			w.WriteHeader(200) // Respond to preflight request
 		}
+}
+
+func sendJSONResponse(w http.ResponseWriter, data interface{}, statusCode int) {
+	w.WriteHeader(statusCode) // Set the HTTP status code for the response
+	encoder := json.NewEncoder(w) // Create a JSON encoder that writes to the response writer
+	encoder.Encode(data) // Encode the data as JSON and write it to the response
 }
 
 func main () {
