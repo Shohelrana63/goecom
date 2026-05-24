@@ -23,9 +23,8 @@ type Product struct {
 var productList []Product
 
 func getProductsHandler(w http.ResponseWriter, r *http.Request) {
-   w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
-   w.Header().Set("Content-Type", "application/json") // Set content type to JSON
-
+    corsMiddleware(w) // Set CORS headers
+     
 	if r.Method != "GET"{
 		http.Error(w, "Please use GET request", 400)
 		return
@@ -36,16 +35,9 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func createProductHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
-	w.Header().Set("Access-Control-Allow-Methods", "POST") // Allow only POST method
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
-	w.Header().Set("Content-Type", "application/json") // Set content type to JSON
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(200) // Respond to preflight request
-		return
-	}
-
+	corsMiddleware(w) // Set CORS headers
+    handlePreflightReq(w, r) // Handle preflight request for CORS
+	
 	if r.Method != "POST"{
 		http.Error(w, "Please use POST request", 400)
 		return
@@ -64,6 +56,19 @@ func createProductHandler(w http.ResponseWriter, r *http.Request) {
 	w.writeHeader(201) // Set status code to 201 Created
 	encoder := json.NewEncoder(w)
 	encoder.Encode(newProduct) // Return the newly created product as a response
+}
+
+func corsMiddleware(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow CORS for all origins
+	w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS") // Allow specified methods
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type") // Allow Content-Type header
+	w.Header().Set("Content-Type", "application/json") // Set content type to JSON
+}
+
+func handlePreflightReq(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+			w.WriteHeader(200) // Respond to preflight request
+		}
 }
 
 func main () {
